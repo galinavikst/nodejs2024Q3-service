@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Param,
@@ -47,13 +48,13 @@ export class TracksController {
     if (
       ((typeof body.albumId === 'string' && body.albumId.trim() !== '') ||
         !body.albumId) &&
-      ((typeof body.artistId === 'string' && body.albumId.trim() !== '') ||
+      ((typeof body.artistId === 'string' && body.artistId.trim() !== '') ||
         !body.artistId)
     ) {
       return await this.trackService.create(body); // positive default status code - 201 Created
     } else {
       throw new HttpException(
-        'Invalid albumId or artistId, if defined -> should not be empty string or null',
+        'Invalid albumId or artistId, if defined -> should be not empty string or null',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -70,23 +71,24 @@ export class TracksController {
     if (
       ((typeof body.albumId === 'string' && body.albumId.trim() !== '') ||
         !body.albumId) &&
-      ((typeof body.artistId === 'string' && body.albumId.trim() !== '') ||
+      ((typeof body.artistId === 'string' && body.artistId.trim() !== '') ||
         !body.artistId)
     ) {
       const user = await this.trackService.getTrackById(id);
       if (!user)
-        throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+        throw new HttpException('Track not found.', HttpStatus.NOT_FOUND);
 
       return this.trackService.update(id, body);
     } else {
       throw new HttpException(
-        'Invalid albumId or artistId, if defined -> should not be empty string or null',
+        'Invalid albumId or artistId, if defined -> should be not empty string or null',
         HttpStatus.BAD_REQUEST,
       );
     }
   }
 
   @Delete(':id')
+  @HttpCode(204) // by default 204 if the record is found and deleted
   async delete(@Param('id') id: string) {
     if (!isValidUuid(id))
       throw new HttpException('Invalid track id.', HttpStatus.BAD_REQUEST);

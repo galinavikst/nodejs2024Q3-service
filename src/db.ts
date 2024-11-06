@@ -1,4 +1,4 @@
-import { ITrack, IUser } from './interfaces';
+import { IAlbum, ITrack, IUser } from './interfaces';
 
 export class UserRepo {
   private usersDb: Record<string, IUser> = {};
@@ -54,6 +54,32 @@ export class TracksRepo {
   }
 }
 
-export const albumsDB = {};
+export class AlbumsRepo {
+  private albumsDB: Record<string, IAlbum> = {};
+
+  findAll() {
+    return this.albumsDB;
+  }
+
+  save(album: IAlbum) {
+    this.albumsDB[album.id] = album;
+  }
+
+  getById(id: string) {
+    return this.albumsDB[id];
+  }
+
+  update(updatedAlbum: IAlbum) {
+    this.albumsDB[updatedAlbum.id] = updatedAlbum;
+    return this.albumsDB[updatedAlbum.id];
+  }
+
+  delete(id: string) {
+    const deletedTrack = this.albumsDB[id];
+    delete this.albumsDB[id];
+    return deletedTrack;
+  }
+}
+
 export const artistsDB = {};
 export const favoritesDB = {};

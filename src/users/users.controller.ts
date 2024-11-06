@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Param,
@@ -68,6 +69,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @HttpCode(204) // by default 204 if the record is found and deleted
   async delete(@Param('id') id: string) {
     if (!isValidUuid(id))
       throw new HttpException('Invalid user id.', HttpStatus.BAD_REQUEST);
