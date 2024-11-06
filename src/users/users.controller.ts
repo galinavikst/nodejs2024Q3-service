@@ -1,18 +1,19 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Param,
   Post,
-  Res,
-  HttpCode,
+  Put,
 } from '@nestjs/common';
 import { validate as isValidUuid } from 'uuid';
 import { IUser } from 'src/interfaces';
 import { UserService } from './users.service';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto, GetUserDto, UpdatePasswordDto } from './dto/user.dto';
+import { plainToClass } from 'class-transformer';
 
 @Controller('user')
 export class UsersController {
@@ -27,27 +28,53 @@ export class UsersController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
 
-    return users;
+    return users; // positive default statusCode 200
   }
 
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<Omit<IUser, 'password'>> {
-    const user = await this.userService.getUserById(id);
-
     if (!isValidUuid(id))
       throw new HttpException('Invalid user id.', HttpStatus.BAD_REQUEST);
 
+    const user = await this.userService.getUserById(id);
     if (!user) throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
 
-    if (Object.keys(user).length === 0) {
-      return; // Implicitly return 204 No Content
-    }
-
-    return user;
+    return plainToClass(GetUserDto, user); // positive default statusCode 200
   }
 
   @Post()
   async create(@Body() body: CreateUserDto): Promise<IUser> {
-    return await this.userService.create(body);
+    return await this.userService.create(body); // positive default status code - 201 Created
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() body: UpdatePasswordDto,
+  ): Promise<IUser> {
+    if (!isValidUuid(id))
+      throw new HttpException('Invalid user id.', HttpStatus.BAD_REQUEST);
+
+    const user = await this.userService.getUserById(id);
+    if (!user) throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+
+    if (body.oldPassword !== user.password)
+      throw new HttpException('Old password is wrong', HttpStatus.FORBIDDEN);
+
+    return plainToClass(
+      GetUserDto,
+      this.userService.update(id, body.newPassword),
+    );
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    if (!isValidUuid(id))
+      throw new HttpException('Invalid user id.', HttpStatus.BAD_REQUEST);
+
+    const user = await this.userService.getUserById(id);
+    if (!user) throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+
+    return plainToClass(GetUserDto, this.userService.delete(id));
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IUser } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateUserDto, GetUserDto } from './dto/user.dto';
+import { CreateUserDto, GetUserDto, UpdatePasswordDto } from './dto/user.dto';
 import { UserRepo } from 'src/db';
 import { plainToClass } from 'class-transformer';
 
@@ -25,7 +25,7 @@ export class UserService {
         ...user,
         id,
         version: 1,
-        createdAt: Date.now(), // timestamp
+        createdAt: Date.now(), // timestamp number
         updatedAt: Date.now(),
       };
       this.usersDB.save(newUser);
@@ -38,9 +38,33 @@ export class UserService {
 
   async getUserById(id: string) {
     try {
-      return plainToClass(GetUserDto, this.usersDB.getById(id));
+      return this.usersDB.getById(id);
     } catch (error) {
       console.log('getUserById servise', error);
+    }
+  }
+
+  async update(id: string, newPassword: string) {
+    try {
+      const user = this.usersDB.getById(id);
+      const updatedUser = {
+        ...user,
+        password: newPassword,
+        version: user.version + 1,
+        updatedAt: Date.now(),
+      };
+
+      return this.usersDB.update(updatedUser);
+    } catch (error) {
+      console.log('update servise', error);
+    }
+  }
+
+  async delete(id: string) {
+    try {
+      return await this.usersDB.delete(id);
+    } catch (error) {
+      console.log('delete servise', error);
     }
   }
 }

@@ -7,11 +7,6 @@ export interface IUser {
   updatedAt: number; // timestamp of last update
 }
 
-// export interface IUpdatePasswordDto {
-//   oldPassword: string; // previous password
-//   newPassword: string; // new password
-// }
-
 export interface IArtist {
   id: string; // uuid v4
   name: string;
