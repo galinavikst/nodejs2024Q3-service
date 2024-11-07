@@ -13,7 +13,8 @@ import {
 import { validate as isValidUuid } from 'uuid';
 import { IAlbum, ITrack } from 'src/interfaces';
 import { AlbumsService } from './albums.service';
-import { GetAlbumDto, UpdateAlbumDto } from './dto/albums.dto';
+import { CreateAlbumDto, GetAlbumDto, UpdateAlbumDto } from './dto/albums.dto';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('album')
 export class AlbumsController {
@@ -44,7 +45,8 @@ export class AlbumsController {
   }
 
   @Post()
-  async create(@Body() body: GetAlbumDto): Promise<IAlbum> {
+  @ApiBody({ type: [CreateAlbumDto] })
+  async create(@Body() body: CreateAlbumDto): Promise<IAlbum> {
     if (
       (typeof body.artistId === 'string' && body.artistId.trim() !== '') ||
       !body.artistId
@@ -59,6 +61,7 @@ export class AlbumsController {
   }
 
   @Put(':id')
+  @ApiBody({ type: [UpdateAlbumDto] })
   async update(
     @Param('id') id: string,
     @Body() body: UpdateAlbumDto,

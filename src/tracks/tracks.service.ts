@@ -3,7 +3,7 @@ import { ITrack, IUser } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { TracksRepo, UserRepo } from 'src/db';
 import { plainToClass } from 'class-transformer';
-import { GetTrackDto } from './dto/tracks.dto';
+import { CreateTrackDto, GetTrackDto } from './dto/tracks.dto';
 
 @Injectable()
 export class TrackService {
@@ -19,7 +19,7 @@ export class TrackService {
     }
   }
 
-  async create(track: GetTrackDto): Promise<ITrack> {
+  async create(track: CreateTrackDto): Promise<ITrack> {
     try {
       const id = uuidv4();
       const newTrack = {

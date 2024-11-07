@@ -13,7 +13,8 @@ import {
 import { validate as isValidUuid } from 'uuid';
 import { ITrack } from 'src/interfaces';
 import { TrackService } from './tracks.service';
-import { GetTrackDto, UpdateTrackDto } from './dto/tracks.dto';
+import { CreateTrackDto, GetTrackDto, UpdateTrackDto } from './dto/tracks.dto';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('track')
 export class TracksController {
@@ -32,7 +33,7 @@ export class TracksController {
   }
 
   @Get(':id')
-  async getUserById(@Param('id') id: string): Promise<ITrack> {
+  async getTrackById(@Param('id') id: string): Promise<ITrack> {
     if (!isValidUuid(id))
       throw new HttpException('Invalid track id.', HttpStatus.BAD_REQUEST);
 
@@ -44,7 +45,8 @@ export class TracksController {
   }
 
   @Post()
-  async create(@Body() body: GetTrackDto): Promise<ITrack> {
+  @ApiBody({ type: [CreateTrackDto] })
+  async create(@Body() body: CreateTrackDto): Promise<ITrack> {
     if (
       ((typeof body.albumId === 'string' && body.albumId.trim() !== '') ||
         !body.albumId) &&
@@ -61,6 +63,7 @@ export class TracksController {
   }
 
   @Put(':id')
+  @ApiBody({ type: [UpdateTrackDto] })
   async update(
     @Param('id') id: string,
     @Body() body: UpdateTrackDto,

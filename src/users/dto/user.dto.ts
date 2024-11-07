@@ -1,11 +1,14 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
+  @ApiProperty()
   @IsNotEmpty() // required -> 400 bad request if empty or undefined
   @IsString()
   login: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
@@ -13,11 +16,13 @@ export class CreateUserDto {
 }
 
 export class UpdatePasswordDto {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
   oldPassword: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
