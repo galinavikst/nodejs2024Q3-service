@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ITrack, IUser } from 'src/interfaces';
+import { ITrack } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { TracksRepo, UserRepo } from 'src/db';
-import { plainToClass } from 'class-transformer';
-import { CreateTrackDto, GetTrackDto } from './dto/tracks.dto';
+import { TracksRepo } from 'src/db';
+import { CreateTrackDto } from './dto/tracks.dto';
 
 @Injectable()
 export class TrackService {

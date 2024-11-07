@@ -13,7 +13,7 @@ import {
 import { validate as isValidUuid } from 'uuid';
 import { ITrack } from 'src/interfaces';
 import { TrackService } from './tracks.service';
-import { CreateTrackDto, GetTrackDto, UpdateTrackDto } from './dto/tracks.dto';
+import { CreateTrackDto, UpdateTrackDto } from './dto/tracks.dto';
 import { ApiBody } from '@nestjs/swagger';
 
 @Controller('track')

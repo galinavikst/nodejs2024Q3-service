@@ -1,27 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import {
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
-
-export class GetTrackDto {
-  @IsUUID('4') // Validates UUID v4 format
-  id: string;
-
-  @IsNotEmpty() // required -> 400 bad request if empty or undefined
-  @IsString()
-  name: string;
-
-  artistId: string | null; // refers to Artist
-  albumId: string | null; // refers to Album
-
-  @IsNotEmpty()
-  @IsInt()
-  duration: number; // integer number
-}
+import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateTrackDto {
   @ApiProperty()

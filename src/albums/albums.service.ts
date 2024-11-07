@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IAlbum } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { AlbumsRepo } from 'src/db';
-import { CreateAlbumDto, GetAlbumDto } from './dto/albums.dto';
+import { CreateAlbumDto } from './dto/albums.dto';
 import { TrackService } from 'src/tracks/tracks.service';
 
 @Injectable()

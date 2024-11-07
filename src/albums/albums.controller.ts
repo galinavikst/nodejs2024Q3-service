@@ -11,9 +11,9 @@ import {
   Put,
 } from '@nestjs/common';
 import { validate as isValidUuid } from 'uuid';
-import { IAlbum, ITrack } from 'src/interfaces';
+import { IAlbum } from 'src/interfaces';
 import { AlbumsService } from './albums.service';
-import { CreateAlbumDto, GetAlbumDto, UpdateAlbumDto } from './dto/albums.dto';
+import { CreateAlbumDto, UpdateAlbumDto } from './dto/albums.dto';
 import { ApiBody } from '@nestjs/swagger';
 
 @Controller('album')
