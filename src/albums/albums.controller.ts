@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -6,11 +7,13 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { validate as isValidUuid } from 'uuid';
 import { IAlbum } from 'src/interfaces';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto, UpdateAlbumDto } from './dto/albums.dto';
@@ -23,23 +26,17 @@ export class AlbumsController {
   @Get()
   async findAll(): Promise<IAlbum[]> {
     const albums = await this.albumsService.findAll();
-    if (!albums)
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    if (!albums) throw new InternalServerErrorException();
 
     return albums; // positive default statusCode 200
   }
 
   @Get(':id')
-  async getAlbumById(@Param('id') id: string): Promise<IAlbum> {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid album id.', HttpStatus.BAD_REQUEST);
-
-    const track = await this.albumsService.getAlbumById(id);
-    if (!track)
-      throw new HttpException('Album not found.', HttpStatus.NOT_FOUND);
+  async getAlbumById(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<IAlbum> {
+    const track = await this.albumsService.getItemById(id);
+    if (!track) throw new NotFoundException();
 
     return track; // positive default statusCode 200
   }
@@ -53,9 +50,8 @@ export class AlbumsController {
     ) {
       return await this.albumsService.create(body); // positive default status code - 201 Created
     } else {
-      throw new HttpException(
+      throw new BadRequestException(
         'Invalid artistId, if defined -> should be not empty string or null',
-        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -63,19 +59,15 @@ export class AlbumsController {
   @Put(':id')
   @ApiBody({ type: [UpdateAlbumDto] })
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateAlbumDto,
   ): Promise<IAlbum> {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid album id.', HttpStatus.BAD_REQUEST);
-
     if (
       (typeof body.artistId === 'string' && body.artistId.trim() !== '') ||
       !body.artistId
     ) {
-      const album = await this.albumsService.getAlbumById(id);
-      if (!album)
-        throw new HttpException('Album not found.', HttpStatus.NOT_FOUND);
+      const album = await this.albumsService.getItemById(id);
+      if (!album) throw new NotFoundException();
 
       return this.albumsService.update(id, body);
     } else {
@@ -88,13 +80,9 @@ export class AlbumsController {
 
   @Delete(':id')
   @HttpCode(204) // by default 204 if the record is found and deleted
-  async delete(@Param('id') id: string) {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid album id.', HttpStatus.BAD_REQUEST);
-
-    const track = await this.albumsService.getAlbumById(id);
-    if (!track)
-      throw new HttpException('Track not found.', HttpStatus.NOT_FOUND);
+  async delete(@Param('id', new ParseUUIDPipe()) id: string) {
+    const track = await this.albumsService.getItemById(id);
+    if (!track) throw new NotFoundException();
 
     return this.albumsService.delete(id);
   }

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ITrack } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { TracksRepo } from 'src/db';
-import { CreateTrackDto } from './dto/tracks.dto';
+import { FavRepo, TracksRepo } from 'src/db';
+import { CreateTrackDto, UpdateTrackDto } from './dto/tracks.dto';
 
 @Injectable()
 export class TrackService {
-  constructor(private tracksDB: TracksRepo) {}
+  constructor(private tracksDB: TracksRepo, private favDB: FavRepo) {}
 
   async findAll(): Promise<ITrack[]> {
     try {
@@ -35,7 +35,7 @@ export class TrackService {
     }
   }
 
-  async getTrackById(id: string) {
+  async getItemById(id: string) {
     try {
       return this.tracksDB.getById(id);
     } catch (error) {
@@ -43,7 +43,7 @@ export class TrackService {
     }
   }
 
-  async update(id: string, body: {}) {
+  async update(id: string, body: UpdateTrackDto) {
     try {
       const track = this.tracksDB.getById(id);
       const updatedTrack = {
@@ -59,6 +59,12 @@ export class TrackService {
 
   async delete(id: string) {
     try {
+      // remove form favorites if there
+      const favDB = await this.favDB.findAll();
+      if (favDB.tracks.includes(id)) {
+        await this.favDB.delete('tracks', id);
+      }
+
       return this.tracksDB.delete(id);
     } catch (error) {
       console.log('delete TrackService', error);

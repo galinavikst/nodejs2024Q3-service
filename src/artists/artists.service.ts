@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IArtist } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { ArtistsRepo } from 'src/db';
+import { ArtistsRepo, FavRepo } from 'src/db';
 import { CreateArtistDto, UpdateArtistDto } from './dto/artist.dto';
 import { AlbumsService } from 'src/albums/albums.service';
 import { TrackService } from 'src/tracks/tracks.service';
@@ -10,6 +10,7 @@ import { TrackService } from 'src/tracks/tracks.service';
 export class ArtistsService {
   constructor(
     private artistsDB: ArtistsRepo,
+    private favDB: FavRepo,
     private albumsService: AlbumsService,
     private tracksService: TrackService,
   ) {}
@@ -37,7 +38,7 @@ export class ArtistsService {
     }
   }
 
-  async getArtistById(id: string) {
+  async getItemById(id: string) {
     try {
       return this.artistsDB.getById(id);
     } catch (error) {
@@ -47,7 +48,6 @@ export class ArtistsService {
 
   async update(artist: IArtist, body: UpdateArtistDto) {
     try {
-      //const artist = this.artistsDB.getById(id);
       const updatedArtist = {
         ...artist,
         ...body,
@@ -61,10 +61,16 @@ export class ArtistsService {
 
   async delete(id: string) {
     try {
+      // remove form favorites if there
+      const favDB = await this.favDB.findAll();
+      if (favDB.artists.includes(id)) {
+        await this.favDB.delete('artists', id);
+      }
+
       // update albums with artstId: null
       const albums = await this.albumsService.findAll();
       const albumsWithArtist = albums.filter((album) => album.artistId === id);
-      for (let album of albumsWithArtist) {
+      for (const album of albumsWithArtist) {
         await this.albumsService.update(album.id, { artistId: null });
       }
 
@@ -74,7 +80,7 @@ export class ArtistsService {
       for (const track of tracksWithArtist) {
         await this.tracksService.update(track.id, {
           artistId: null,
-          albumId: null, // it wasn't in the task but seems logical
+          albumId: null,
         });
       }
 

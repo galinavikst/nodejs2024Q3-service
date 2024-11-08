@@ -4,13 +4,13 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { validate as isValidUuid } from 'uuid';
 import { IArtist } from 'src/interfaces';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto, UpdateArtistDto } from './dto/artist.dto';
@@ -23,23 +23,17 @@ export class ArtistsController {
   @Get()
   async findAll(): Promise<IArtist[]> {
     const artists = await this.artistsService.findAll();
-    if (!artists)
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    if (!artists) throw new InternalServerErrorException();
 
     return artists; // positive default statusCode 200
   }
 
   @Get(':id')
-  async getArtistById(@Param('id') id: string): Promise<IArtist> {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid id.', HttpStatus.BAD_REQUEST);
-
-    const artist = await this.artistsService.getArtistById(id);
-    if (!artist)
-      throw new HttpException('Artist not found.', HttpStatus.NOT_FOUND);
+  async getArtistById(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<IArtist> {
+    const artist = await this.artistsService.getItemById(id);
+    if (!artist) throw new NotFoundException();
 
     return artist; // positive default statusCode 200
   }
@@ -53,28 +47,20 @@ export class ArtistsController {
   @Put(':id')
   @ApiBody({ type: UpdateArtistDto })
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateArtistDto,
   ): Promise<IArtist> {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid id.', HttpStatus.BAD_REQUEST);
-
-    const artist = await this.artistsService.getArtistById(id);
-    if (!artist)
-      throw new HttpException('Artist not found.', HttpStatus.NOT_FOUND);
+    const artist = await this.artistsService.getItemById(id);
+    if (!artist) throw new NotFoundException();
 
     return this.artistsService.update(artist, body);
   }
 
   @Delete(':id')
   @HttpCode(204) // by default 204 if the record is found and deleted
-  async delete(@Param('id') id: string) {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid id.', HttpStatus.BAD_REQUEST);
-
-    const artist = await this.artistsService.getArtistById(id);
-    if (!artist)
-      throw new HttpException('Artist not found.', HttpStatus.NOT_FOUND);
+  async delete(@Param('id', new ParseUUIDPipe()) id: string) {
+    const artist = await this.artistsService.getItemById(id);
+    if (!artist) throw new NotFoundException();
 
     return this.artistsService.delete(id);
   }

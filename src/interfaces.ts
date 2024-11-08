@@ -28,13 +28,13 @@ export interface IAlbum {
   artistId: string | null; // refers to Artist
 }
 
-export interface IFavorites {
+export interface IFav {
   artists: string[]; // favorite artists ids
   albums: string[]; // favorite albums ids
   tracks: string[]; // favorite tracks ids
 }
 
-export interface IFavoritesResponse {
+export interface IFavResponse {
   artists: IArtist[];
   albums: IAlbum[];
   tracks: ITrack[];

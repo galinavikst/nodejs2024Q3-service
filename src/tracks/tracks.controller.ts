@@ -1,16 +1,17 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
-import { validate as isValidUuid } from 'uuid';
 import { ITrack } from 'src/interfaces';
 import { TrackService } from './tracks.service';
 import { CreateTrackDto, UpdateTrackDto } from './dto/tracks.dto';
@@ -23,23 +24,17 @@ export class TracksController {
   @Get()
   async findAll(): Promise<ITrack[]> {
     const tracks = await this.trackService.findAll();
-    if (!tracks)
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    if (!tracks) throw new InternalServerErrorException();
 
     return tracks; // positive default statusCode 200
   }
 
   @Get(':id')
-  async getTrackById(@Param('id') id: string): Promise<ITrack> {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid track id.', HttpStatus.BAD_REQUEST);
-
-    const track = await this.trackService.getTrackById(id);
-    if (!track)
-      throw new HttpException('Track not found.', HttpStatus.NOT_FOUND);
+  async getTrackById(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<ITrack> {
+    const track = await this.trackService.getItemById(id);
+    if (!track) throw new NotFoundException();
 
     return track; // positive default statusCode 200
   }
@@ -55,9 +50,8 @@ export class TracksController {
     ) {
       return await this.trackService.create(body); // positive default status code - 201 Created
     } else {
-      throw new HttpException(
+      throw new BadRequestException(
         'Invalid albumId or artistId, if defined -> should be not empty string or null',
-        HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -65,40 +59,31 @@ export class TracksController {
   @Put(':id')
   @ApiBody({ type: [UpdateTrackDto] })
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateTrackDto,
   ): Promise<ITrack> {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid track id.', HttpStatus.BAD_REQUEST);
-
     if (
       ((typeof body.albumId === 'string' && body.albumId.trim() !== '') ||
         !body.albumId) &&
       ((typeof body.artistId === 'string' && body.artistId.trim() !== '') ||
         !body.artistId)
     ) {
-      const user = await this.trackService.getTrackById(id);
-      if (!user)
-        throw new HttpException('Track not found.', HttpStatus.NOT_FOUND);
+      const user = await this.trackService.getItemById(id);
+      if (!user) throw new NotFoundException();
 
       return this.trackService.update(id, body);
     } else {
-      throw new HttpException(
+      throw new BadRequestException(
         'Invalid albumId or artistId, if defined -> should be not empty string or null',
-        HttpStatus.BAD_REQUEST,
       );
     }
   }
 
   @Delete(':id')
   @HttpCode(204) // by default 204 if the record is found and deleted
-  async delete(@Param('id') id: string) {
-    if (!isValidUuid(id))
-      throw new HttpException('Invalid track id.', HttpStatus.BAD_REQUEST);
-
-    const track = await this.trackService.getTrackById(id);
-    if (!track)
-      throw new HttpException('Track not found.', HttpStatus.NOT_FOUND);
+  async delete(@Param('id', new ParseUUIDPipe()) id: string) {
+    const track = await this.trackService.getItemById(id);
+    if (!track) throw new NotFoundException();
 
     return this.trackService.delete(id);
   }
