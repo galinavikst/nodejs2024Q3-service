@@ -17,8 +17,9 @@ import {
 import { IAlbum } from 'src/interfaces';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto, UpdateAlbumDto } from './dto/albums.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Albums')
 @Controller('album')
 export class AlbumsController {
   constructor(private albumsService: AlbumsService) {}
@@ -32,6 +33,7 @@ export class AlbumsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get all albums' })
   async getAlbumById(
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<IAlbum> {
@@ -42,7 +44,8 @@ export class AlbumsController {
   }
 
   @Post()
-  @ApiBody({ type: [CreateAlbumDto] })
+  @ApiOperation({ summary: 'Create album' })
+  @ApiBody({ type: CreateAlbumDto })
   async create(@Body() body: CreateAlbumDto): Promise<IAlbum> {
     if (
       (typeof body.artistId === 'string' && body.artistId.trim() !== '') ||
@@ -57,6 +60,7 @@ export class AlbumsController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update album' })
   @ApiBody({ type: [UpdateAlbumDto] })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -79,6 +83,7 @@ export class AlbumsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete album' })
   @HttpCode(204) // by default 204 if the record is found and deleted
   async delete(@Param('id', new ParseUUIDPipe()) id: string) {
     const track = await this.albumsService.getItemById(id);

@@ -17,7 +17,7 @@ import { HelperModule } from './helper/helper.module';
     FavModule,
     HelperModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

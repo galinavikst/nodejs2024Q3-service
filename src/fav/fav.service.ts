@@ -30,6 +30,7 @@ export class FavService {
   async delete(field: string, id: string) {
     try {
       await this.favDB.delete(field, id);
+
       return `${id} deleted from ${field}`;
     } catch (error) {
       console.log('delete favService', error);

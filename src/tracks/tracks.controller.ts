@@ -15,13 +15,15 @@ import {
 import { ITrack } from 'src/interfaces';
 import { TrackService } from './tracks.service';
 import { CreateTrackDto, UpdateTrackDto } from './dto/tracks.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Tracks')
 @Controller('track')
 export class TracksController {
   constructor(private trackService: TrackService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all tracks' })
   async findAll(): Promise<ITrack[]> {
     const tracks = await this.trackService.findAll();
     if (!tracks) throw new InternalServerErrorException();
@@ -30,6 +32,7 @@ export class TracksController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get track by id' })
   async getTrackById(
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<ITrack> {
@@ -40,7 +43,8 @@ export class TracksController {
   }
 
   @Post()
-  @ApiBody({ type: [CreateTrackDto] })
+  @ApiOperation({ summary: 'Create track' })
+  @ApiBody({ type: CreateTrackDto })
   async create(@Body() body: CreateTrackDto): Promise<ITrack> {
     if (
       ((typeof body.albumId === 'string' && body.albumId.trim() !== '') ||
@@ -57,7 +61,8 @@ export class TracksController {
   }
 
   @Put(':id')
-  @ApiBody({ type: [UpdateTrackDto] })
+  @ApiOperation({ summary: 'Update track' })
+  @ApiBody({ type: UpdateTrackDto })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateTrackDto,
@@ -80,6 +85,7 @@ export class TracksController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete track' })
   @HttpCode(204) // by default 204 if the record is found and deleted
   async delete(@Param('id', new ParseUUIDPipe()) id: string) {
     const track = await this.trackService.getItemById(id);

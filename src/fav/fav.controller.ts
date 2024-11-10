@@ -14,7 +14,9 @@ import { FavService } from './fav.service';
 import { IFavResponse } from 'src/interfaces';
 import { FavRepo } from 'src/db';
 import { HelperService } from 'src/helper/helper.service';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Favorites')
 @Controller('favs')
 export class FavController {
   constructor(
@@ -24,6 +26,7 @@ export class FavController {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all favorite items' })
   async findAll(): Promise<IFavResponse> {
     const favs = await this.favService.findAll();
     if (!favs) throw new InternalServerErrorException();
@@ -32,9 +35,17 @@ export class FavController {
   }
 
   @Post(':group/:id')
+  @ApiOperation({ summary: 'Add fav item to related group' })
+  @ApiParam({ name: 'id', description: 'item id to add' })
+  @ApiParam({
+    name: 'group',
+    description: 'where to add',
+    enum: ['track', 'album', 'artist'],
+  })
   async create(
-    @Param('group') group: string,
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('group')
+    group: string,
+    @Param('id', new ParseUUIDPipe()) id: string, // 400 not uuid
   ) {
     const favGroups = await this.helperService.createFavGroups('getItemById');
 
@@ -51,9 +62,16 @@ export class FavController {
   }
 
   @Delete(':group/:id')
+  @ApiOperation({ summary: 'Delete fav item from related group' })
+  @ApiParam({ name: 'id', description: 'item to delete' })
+  @ApiParam({
+    name: 'group',
+    description: 'from where to delete',
+    enum: ['track', 'album', 'artist'],
+  })
   @HttpCode(204) // defalut positive the record is found and deleted
   async delete(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('id', new ParseUUIDPipe()) id: string, // 400 id is not uuid
     @Param('group') group: string,
   ) {
     const favGroups = await this.helperService.createFavGroups('delete');

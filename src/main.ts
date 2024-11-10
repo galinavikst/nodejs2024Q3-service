@@ -11,8 +11,8 @@ async function bootstrap() {
 
   function createSwaggerDocument(app: INestApplication): OpenAPIObject {
     const config = new DocumentBuilder()
-      .setTitle('Home Library Service API')
-      .setDescription('The API description')
+      .setTitle('Home Library Service')
+      .setDescription('Home music library service')
       .setVersion('1.0')
       .build();
 
@@ -23,7 +23,9 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   // filter out properties that should not be received by the method handler
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, stopAtFirstError: true }),
+  );
 
   const port = process.env.PORT;
   await app.listen(port);

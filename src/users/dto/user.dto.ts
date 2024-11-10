@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty()
@@ -11,7 +11,10 @@ export class CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @MinLength(3)
+  @Matches(/^[a-zA-Z0-9]{3,30}/, {
+    message:
+      'Password must be 3 to 30 characters long and contain only letters and numbers',
+  })
   password: string;
 }
 
@@ -19,13 +22,15 @@ export class UpdatePasswordDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @MinLength(3)
+  //@MinLength(3)
   oldPassword: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    pattern: '^[a-zA-Z0-9]{3,30}',
+  })
   @IsNotEmpty()
   @IsString()
-  @MinLength(3)
+  //@MinLength(3)
   newPassword: string;
 }
 
