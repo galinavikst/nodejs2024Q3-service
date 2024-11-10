@@ -20,7 +20,7 @@ async function bootstrap() {
   }
 
   const document = createSwaggerDocument(app);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('doc', app, document);
 
   // filter out properties that should not be received by the method handler
   app.useGlobalPipes(
