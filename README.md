@@ -11,6 +11,11 @@
 git clone https://github.com/galinavikst/nodejs2024Q3-service.git
 ```
 
+## Navigating to the project directory:
+```
+cd nodejs2024Q3-service
+```
+
 ## Installing NPM modules
 
 ```
@@ -20,7 +25,7 @@ npm install
 ## Running application
 
 ```
-npm start
+npm run start
 ```
 
 After starting the app on port (4000 as default) you can open
