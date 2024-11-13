@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IUser } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto, GetUserDto } from './dto/user.dto';
-import { UserRepo } from 'src/db';
 import { plainToClass } from 'class-transformer';
-//import { AppDataSource } from 'src/data-source';
 import { User } from './user.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -46,11 +44,6 @@ export class UserService {
   async getUserById(id: string) {
     try {
       const user = await this.usersDB.findOneBy({ id });
-
-      // if (user) {
-      //   user.createdAt = Number(user.createdAt); // data base converts timestamp to string as it is bigint
-      //   user.updatedAt = Number(user.updatedAt);
-      // }
 
       return user;
     } catch (error) {

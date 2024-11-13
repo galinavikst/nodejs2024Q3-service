@@ -1,18 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { ITrack } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { FavRepo, TracksRepo } from 'src/db';
+//import { FavRepo } from 'src/db';
 import { CreateTrackDto, UpdateTrackDto } from './dto/tracks.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Track } from './track.model';
+import { Repository } from 'typeorm';
+import { Fav } from 'src/fav/fav.model';
+import { FavService } from 'src/fav/fav.service';
 
 @Injectable()
 export class TrackService {
-  constructor(private tracksDB: TracksRepo, private favDB: FavRepo) {}
+  constructor(
+    @InjectRepository(Track)
+    private tracksDB: Repository<Track>,
+    @InjectRepository(Fav)
+    private favDB: Repository<Fav>, // private favService: FavService,
+  ) {}
 
   async findAll(): Promise<ITrack[]> {
     try {
-      const tracks = this.tracksDB.findAll();
+      const tracks = await this.tracksDB.find();
 
-      return Object.values(tracks);
+      return tracks;
     } catch (error) {
       console.log('findAll TrackService', error);
     }
@@ -21,15 +31,16 @@ export class TrackService {
   async create(track: CreateTrackDto): Promise<ITrack> {
     try {
       const id = uuidv4();
-      const newTrack = {
+      const newTrack = this.tracksDB.create({
         ...track,
         artistId: track.artistId || null,
         albumId: track.albumId || null,
         id,
-      };
-      this.tracksDB.save(newTrack);
+      });
 
-      return newTrack;
+      const response = await this.tracksDB.save(newTrack);
+
+      return response;
     } catch (error) {
       console.log('create TrackService', error);
     }
@@ -37,7 +48,8 @@ export class TrackService {
 
   async getItemById(id: string) {
     try {
-      return this.tracksDB.getById(id);
+      const track = await this.tracksDB.findOneBy({ id });
+      return track;
     } catch (error) {
       console.log('getTrackById TrackService', error);
     }
@@ -45,13 +57,7 @@ export class TrackService {
 
   async update(id: string, body: UpdateTrackDto) {
     try {
-      const track = this.tracksDB.getById(id);
-      const updatedTrack = {
-        ...track,
-        ...body,
-      };
-
-      return this.tracksDB.update(updatedTrack);
+      return await this.tracksDB.save({ ...body, id });
     } catch (error) {
       console.log('update TrackService', error);
     }
@@ -60,12 +66,16 @@ export class TrackService {
   async delete(id: string) {
     try {
       // remove form favorites if there
-      const favDB = await this.favDB.findAll();
-      if (favDB.tracks.includes(id)) {
-        await this.favDB.delete('tracks', id);
+      const favDB = await this.favDB.find();
+      const favObj = favDB[0];
+      if (favObj.tracks.includes(id)) {
+        const updatedTracks = favObj.tracks.filter((item) => item !== id);
+        favObj.tracks = updatedTracks;
+        await this.favDB.save(favObj);
       }
+      //await this.favService.delete('albums', id);
 
-      return this.tracksDB.delete(id);
+      return await this.tracksDB.delete(id);
     } catch (error) {
       console.log('delete TrackService', error);
     }

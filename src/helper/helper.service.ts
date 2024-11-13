@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AlbumsService } from 'src/albums/albums.service';
 import { ArtistsService } from 'src/artists/artists.service';
-import { IFavResponse } from 'src/interfaces';
+import { IFav, IFavResponse } from 'src/interfaces';
 import { TrackService } from 'src/tracks/tracks.service';
 
 @Injectable()
@@ -32,12 +32,12 @@ export class HelperService {
     };
   }
 
-  async getFavs(favDB: Record<string, string[]>) {
-    const favs: IFavResponse = {
-      artists: [],
-      albums: [],
-      tracks: [],
-    };
+  async getFavs(favs: IFav) {
+    // const favs: IFavResponse = {
+    //   artists: [],
+    //   albums: [],
+    //   tracks: [],
+    // };
 
     // the way with promise all
     // async function fetchItemsByIds(
@@ -53,21 +53,42 @@ export class HelperService {
     //   fetchItemsByIds(favDB.tracks, this.trackService),
     // ]);
 
-    for (const id of favDB.artists) {
-      const artist = await this.artistsService.getItemById(id);
-      favs.artists.push(artist);
-    }
+    // Fetch all artists in parallel
+    const artists = await Promise.all(
+      favs.artists.map((id) => this.artistsService.getItemById(id)),
+    );
 
-    for (const id of favDB.albums) {
-      const album = await this.albumsService.getItemById(id);
-      favs.albums.push(album);
-    }
+    // Fetch all albums in parallel
+    const albums = await Promise.all(
+      favs.albums.map((id) => this.albumsService.getItemById(id)),
+    );
 
-    for (const id of favDB.tracks) {
-      const track = await this.trackService.getItemById(id);
-      favs.tracks.push(track);
-    }
+    // Fetch all tracks in parallel
+    const tracks = await Promise.all(
+      favs.tracks.map((id) => this.trackService.getItemById(id)),
+    );
+    // Construct the response
+    const response: IFavResponse = {
+      artists,
+      albums,
+      tracks,
+    };
 
-    return favs;
+    return response;
+
+    // for (const id of favsDb.artists) {
+    //   const artist = await this.artistsService.getItemById(id);
+    //   favs.artists.push(artist);
+    // }
+
+    // for (const id of favsDb.albums) {
+    //   const album = await this.albumsService.getItemById(id);
+    //   favs.albums.push(album);
+    // }
+
+    // for (const id of favsDb.tracks) {
+    //   const track = await this.trackService.getItemById(id);
+    //   favs.tracks.push(track);
+    // }
   }
 }

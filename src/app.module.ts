@@ -9,6 +9,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.model';
 import { DataSource } from 'typeorm';
 import 'reflect-metadata'; // typeorm
+import { Track } from './tracks/track.model';
+import { Fav } from './fav/fav.model';
+import { Artist } from './artists/artist.model';
+import { Album } from './albums/album.model';
 
 @Module({
   imports: [
@@ -27,7 +31,7 @@ import 'reflect-metadata'; // typeorm
       database: 'home',
       synchronize: true,
       logging: true,
-      entities: [User],
+      entities: [User, Track, Fav, Artist, Album],
       subscribers: [],
       migrations: [],
     }),
