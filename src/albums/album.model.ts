@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Artist } from 'src/artists/artist.model';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Album {
@@ -11,6 +12,9 @@ export class Album {
   @Column()
   year: number;
 
-  @Column({ nullable: true })
-  artistId: string | null; // refers to Artist
+  @Column({ type: 'uuid', nullable: true })
+  artistId: string | null;
+  @ManyToOne(() => Artist, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'artistId' }) // Join with the artistId column
+  artist: string | null;
 }
