@@ -35,7 +35,7 @@ export class FavService {
       else favs = favObj;
 
       if (!favs[field].includes(id)) {
-        favs[field].push(id);
+        favs[field] = [...favs[field], id];
         await this.favDB.save(favs);
 
         return `${id} added to ${field}`;

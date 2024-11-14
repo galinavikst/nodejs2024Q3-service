@@ -53,11 +53,6 @@ export class ArtistsService {
 
   async update(artist: IArtist, body: UpdateArtistDto) {
     try {
-      const updatedArtist = {
-        ...artist,
-        ...body,
-      };
-
       return await this.artistsDB.save({ ...body, id: artist.id });
     } catch (error) {
       console.log('update ArtistsService', error);
