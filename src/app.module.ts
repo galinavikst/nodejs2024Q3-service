@@ -13,6 +13,8 @@ import { Track } from './tracks/track.model';
 import { Fav } from './fav/fav.model';
 import { Artist } from './artists/artist.model';
 import { Album } from './albums/album.model';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
   imports: [
@@ -24,13 +26,13 @@ import { Album } from './albums/album.model';
     HelperModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 8080, // postgres post / default 5432 but I installed with 8080
-      username: 'postgres', // postgres default name
-      password: 'halynavs89', // postgres pass when registered
-      database: 'home',
-      synchronize: true,
-      logging: true,
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT, // postgres post / default 5432 but I installed with 8080
+      username: process.env.DB_USERNAME, // postgres default name
+      password: process.env.DB_PASSWORD, // postgres pass when registered
+      database: process.env.DB_DATABASE,
+      synchronize: process.env.DB_SYNCHRONIZE === 'true',
+      logging: process.env.DB_LOGGING === 'true',
       entities: [User, Track, Fav, Artist, Album],
       subscribers: [],
       migrations: [],
