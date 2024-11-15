@@ -1,4 +1,3 @@
-import { BigIntToNumberTransformer } from 'src/transformers';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
@@ -15,9 +14,21 @@ export class User {
   @Column()
   version: number; // integer number, increments on update
 
-  @Column({ type: 'bigint', transformer: BigIntToNumberTransformer })
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseInt(value),
+    },
+  })
   createdAt: number; // 1731494623551 timestamp of creation
 
-  @Column({ type: 'bigint', transformer: BigIntToNumberTransformer })
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseInt(value),
+    },
+  })
   updatedAt: number; // timestamp of last update
 }

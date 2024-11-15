@@ -1,25 +1,22 @@
-// import 'reflect-metadata'; // typeorm
-// import { DataSource } from 'typeorm';
-// import { User } from './users/user.model';
+import 'reflect-metadata'; // typeorm
+import { DataSource } from 'typeorm';
+import { User } from './users/user.model';
+import { Album } from './albums/album.model';
+import { Artist } from './artists/artist.model';
+import { Fav } from './fav/fav.model';
+import { Track } from './tracks/track.model';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-// export const AppDataSource = new DataSource({
-//   type: 'postgres',
-//   host: 'localhost',
-//   port: 8080, // postgres post / default 5432 but i installed with 8080
-//   username: 'postgres', // postgres default name
-//   password: 'halynavs89', // postgres pass when registered
-//   database: 'postgres',
-//   synchronize: true,
-//   logging: true,
-//   entities: [User],
-//   subscribers: [],
-//   migrations: [],
-// });
-
-// AppDataSource.initialize()
-//   .then(() => {
-//     console.log('hello db');
-
-//     // here you can start to work with your database
-//   })
-//   .catch((error) => console.log('data-source', error));
+export const AppDataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.DB_HOST,
+  port: +process.env.DB_PORT || 8080,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  synchronize: process.env.DB_SYNCHRONIZE === 'true',
+  logging: process.env.DB_LOGGING === 'true',
+  entities: [User, Track, Fav, Artist, Album],
+  migrations: ['dist/migrations/*.{js,ts}'],
+});
