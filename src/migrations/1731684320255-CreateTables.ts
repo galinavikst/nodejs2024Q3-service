@@ -8,22 +8,22 @@ export class CreateTables1731684320255 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'string',
+            type: 'varchar',
             isPrimary: true,
             isUnique: true,
             isNullable: false,
           },
           {
             name: 'login',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'password',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'version',
-            type: 'number',
+            type: 'int',
           },
           {
             name: 'createdAt',
@@ -44,28 +44,28 @@ export class CreateTables1731684320255 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'string',
+            type: 'varchar',
             isPrimary: true,
             isUnique: true,
             isNullable: false,
           },
           {
             name: 'name',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'artistId',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
           {
             name: 'albumId',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
           {
             name: 'duration',
-            type: 'number',
+            type: 'int',
           },
         ],
       }),
@@ -111,14 +111,14 @@ export class CreateTables1731684320255 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'string',
+            type: 'varchar',
             isPrimary: true,
             isUnique: true,
             isNullable: false,
           },
           {
             name: 'name',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'grammy',
@@ -136,22 +136,22 @@ export class CreateTables1731684320255 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'string',
+            type: 'varchar',
             isPrimary: true,
             isUnique: true,
             isNullable: false,
           },
           {
             name: 'name',
-            type: 'string',
+            type: 'varchar',
           },
           {
             name: 'year',
-            type: 'number',
+            type: 'int',
           },
           {
             name: 'artistId',
-            type: 'string',
+            type: 'varchar',
             isNullable: true,
           },
         ],
