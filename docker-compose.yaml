@@ -1,20 +1,38 @@
-version: '3'
-
 services:
   node:
     build: .
+    restart: always
     ports:
       - ${PORT}:${PORT}
     depends_on:
       - postgres
     environment:
       - PORT=${PORT}
+    networks:
+      - home-network
+
+    volumes:
+      - db-data:/etc/data
+      # - db-data:/var/lib/postgresql/data # Persistent storage for database data
+      - db-logs:/var/log/postgresql # Persistent storage for PostgreSQL logs
+      # - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql # SQL script to initialize the 'home' database
 
   postgres:
     build: ./src/
+    restart: always
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_DB=${DB_DATABASE}
     ports:
       - ${DB_PORT}:${DB_PORT}
+    networks:
+      - home-network
+
+networks:
+  home-network:
+    driver: bridge
+
+volumes:
+  db-data:
+  db-logs:
