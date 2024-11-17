@@ -1,7 +1,7 @@
 services:
   node:
     build: .
-    restart: always
+    restart: always # restart the container if it stops for any reason
     ports:
       - ${PORT}:${PORT}
     depends_on:
@@ -10,16 +10,18 @@ services:
       - PORT=${PORT}
     networks:
       - home-network
-
     volumes:
-      - db-data:/etc/data
-      # - db-data:/var/lib/postgresql/data # Persistent storage for database data
-      - db-logs:/var/log/postgresql # Persistent storage for PostgreSQL logs
-      # - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql # SQL script to initialize the 'home' database
+      # reloading project with changes
+      - .:/nodejs-service # Mount entire project
+      - /nodejs-service/node_modules # Prevents overwriting node_modules if reloading
+      # storage for database data and PostgreSQL logs
+      - db-data:/var/lib/postgresql/data
+      - db-logs:/var/log/postgresql
+    command: ['npm', 'run', 'start:dev']
 
   postgres:
     build: ./src/
-    restart: always
+    restart: on-failure # Restart only on failure, not when manually stopped
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_USER=${DB_USERNAME}

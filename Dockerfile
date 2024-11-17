@@ -24,4 +24,4 @@ ENV DB_HOST=postgres \
 
 RUN command
  
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "start:dev" ]
