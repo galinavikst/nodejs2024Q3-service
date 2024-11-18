@@ -10,17 +10,27 @@
 ```
 git clone https://github.com/galinavikst/nodejs2024Q3-service.git
 ```
+```
+cd nodejs2024Q3-service
+```
+```
+git checkout dev-db-docker
+```
 
-## Installing NPM modules
+## Run docker
+```
+docker compose up
+```
 
+## Runinig locally
+### Installing NPM modules
 ```
 npm install
 ```
-
-## Running application
+> to run applicatioin locally fix .env file
 
 ```
-npm start
+npm run start
 ```
 
 After starting the app on port (4000 as default) you can open
