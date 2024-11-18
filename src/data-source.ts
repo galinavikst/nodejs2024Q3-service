@@ -7,9 +7,6 @@ import { Fav } from './fav/fav.model';
 import { Track } from './tracks/track.model';
 import { ConfigService } from '@nestjs/config';
 
-// import * as dotenv from 'dotenv';
-// dotenv.config();
-
 const configService = new ConfigService();
 
 export const AppDataSource = new DataSource({
@@ -23,14 +20,4 @@ export const AppDataSource = new DataSource({
   logging: configService.get('DB_LOGGING'),
   entities: [User, Track, Fav, Artist, Album],
   migrations: ['dist/migrations/*.{js,ts}'],
-  // type: 'postgres',
-  // host: process.env.DB_HOST,
-  // port: +process.env.DB_PORT || 5432,
-  // username: process.env.DB_USERNAME,
-  // password: process.env.DB_PASSWORD,
-  // database: process.env.DB_DATABASE,
-  // synchronize: process.env.DB_SYNCHRONIZE === 'true',
-  // logging: process.env.DB_LOGGING === 'true',
-  // entities: [User, Track, Fav, Artist, Album],
-  // migrations: ['dist/migrations/*.{js,ts}'],
 });

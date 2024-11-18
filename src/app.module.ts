@@ -13,8 +13,6 @@ import { Artist } from './artists/artist.model';
 import { Fav } from './fav/fav.model';
 import { Track } from './tracks/track.model';
 import { User } from './users/user.model';
-// import * as dotenv from 'dotenv';
-// dotenv.config();
 
 @Module({
   imports: [
@@ -44,18 +42,6 @@ import { User } from './users/user.model';
         // autoLoadEntities: true,
       }),
     }),
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: process.env.DB_HOST,
-    //   port: +process.env.DB_PORT || 5432,
-    //   username: process.env.DB_USERNAME,
-    //   password: process.env.DB_PASSWORD,
-    //   database: process.env.DB_DATABASE,
-    //   synchronize: process.env.DB_SYNCHRONIZE === 'true',
-    //   logging: process.env.DB_LOGGING === 'true',
-    //   entities: [User, Track, Fav, Artist, Album],
-    //   migrations: ['dist/migrations/*.{js,ts}'],
-    // }),
   ],
   controllers: [],
   providers: [],

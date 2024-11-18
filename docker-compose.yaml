@@ -1,7 +1,7 @@
 services:
   node:
-    # image: halynavs/nodejs-service-node
-    build: .
+    image: halynavs/nodejs-service-node
+    # build: .
     restart: always # restart the container if it stops for any reason
     ports:
       - ${PORT}:${PORT}
@@ -19,8 +19,8 @@ services:
     command: ['npm', 'run', 'start:dev']
 
   postgres:
-    # image: halynavs/nodejs-service-postgres
-    build: ./src/
+    image: halynavs/nodejs-service-postgres
+    # build: ./src/
     restart: on-failure # Restart only on failure, not when manually stopped
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
