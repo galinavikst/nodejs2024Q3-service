@@ -1,5 +1,6 @@
 services:
   node:
+    image: halynavs/nodejs-service-node
     build: .
     restart: always # restart the container if it stops for any reason
     ports:
@@ -14,12 +15,11 @@ services:
       # reloading project with changes
       - .:/nodejs-service # Mount entire project
       - /nodejs-service/node_modules # Prevents overwriting node_modules if reloading
-      # storage for database data and PostgreSQL logs
-      - db-data:/var/lib/postgresql/data
-      - db-logs:/var/log/postgresql
+      - /test
     command: ['npm', 'run', 'start:dev']
 
   postgres:
+    image: halynavs/nodejs-service-postgres
     build: ./src/
     restart: on-failure # Restart only on failure, not when manually stopped
     environment:
@@ -30,6 +30,10 @@ services:
       - ${DB_PORT}:${DB_PORT}
     networks:
       - home-network
+    volumes:
+      # storage for database data and PostgreSQL logs
+      - db-data:/var/lib/postgresql/data
+      - db-logs:/var/log/postgresql
 
 networks:
   home-network:
