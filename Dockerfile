@@ -14,13 +14,8 @@ COPY . .
 EXPOSE 4000
 
 # typeorm config vatiables
-ENV DB_HOST=postgres \
-    DB_PORT=5432 \
-    DB_USERNAME=postgres \
-    DB_PASSWORD=halynavs89 \
-    DB_DATABASE=home \
-    DB_SYNCHRONIZE=true \ 
-    DB_LOGGING=true 
+ENV DB_PORT=5432 \
+    DB_HOST=postgres
 
 RUN command
  
