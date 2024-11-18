@@ -35,6 +35,7 @@ export interface IFav {
 }
 
 export interface IFavResponse {
+  id?: number;
   artists: IArtist[];
   albums: IAlbum[];
   tracks: ITrack[];

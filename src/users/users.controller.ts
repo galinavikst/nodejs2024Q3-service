@@ -7,6 +7,8 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -28,11 +30,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users' })
   async findAll(): Promise<Omit<IUser, 'password'>[]> {
     const users = await this.userService.findAll();
-    if (!users)
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    if (!users) throw new InternalServerErrorException();
 
     return users; // positive default statusCode 200
   }
@@ -43,7 +41,7 @@ export class UsersController {
     @Param('id', new ParseUUIDPipe()) id: string, // 400
   ): Promise<Omit<IUser, 'password'>> {
     const user = await this.userService.getUserById(id);
-    if (!user) throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+    if (!user) throw new NotFoundException();
 
     return plainToClass(GetUserDto, user); // positive default statusCode 200
   }
@@ -62,7 +60,7 @@ export class UsersController {
     @Body() body: UpdatePasswordDto,
   ): Promise<IUser> {
     const user = await this.userService.getUserById(id);
-    if (!user) throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+    if (!user) throw new NotFoundException();
 
     if (body.oldPassword !== user.password)
       throw new HttpException('Old password is wrong', HttpStatus.FORBIDDEN);
@@ -78,7 +76,7 @@ export class UsersController {
   @HttpCode(204) // by default 204 if the record is found and deleted
   async delete(@Param('id', new ParseUUIDPipe()) id: string) {
     const user = await this.userService.getUserById(id);
-    if (!user) throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+    if (!user) throw new NotFoundException();
 
     return plainToClass(GetUserDto, this.userService.delete(id));
   }

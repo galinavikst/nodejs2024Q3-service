@@ -1,17 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { FavRepo } from 'src/db';
+import { InjectRepository } from '@nestjs/typeorm';
 import { HelperService } from 'src/helper/helper.service';
-import { IFavResponse } from 'src/interfaces';
+import { IFav, IFavResponse } from 'src/interfaces';
+import { Repository } from 'typeorm';
+import { Fav } from './fav.model';
 
 @Injectable()
 export class FavService {
-  constructor(private favDB: FavRepo, private helperService: HelperService) {}
+  constructor(
+    @InjectRepository(Fav)
+    private favDB: Repository<Fav>,
+    private helperService: HelperService,
+  ) {}
 
   async findAll(): Promise<IFavResponse> {
     try {
-      const favDB = await this.favDB.findAll();
+      let favs: IFav;
+      const [favObj] = await this.favDB.find(); // get only item
 
-      return await this.helperService.getFavs(favDB);
+      if (!favObj) favs = { artists: [], albums: [], tracks: [] };
+      else favs = favObj;
+
+      return await this.helperService.getFavs(favs);
     } catch (error) {
       console.log('findAll favService', error);
     }
@@ -19,19 +29,34 @@ export class FavService {
 
   async create(field: string, id: string): Promise<string> {
     try {
-      await this.favDB.save(field, id);
+      let favs: IFav;
+      const [favObj] = await this.favDB.find(); // get only item
+      if (!favObj) favs = { artists: [], albums: [], tracks: [] };
+      else favs = favObj;
 
-      return `${id} added to ${field}`;
+      if (!favs[field].includes(id)) {
+        favs[field] = [...favs[field], id];
+        await this.favDB.save(favs);
+
+        return `${id} added to ${field}`;
+      } else return `${id} alredy exist in favorites ${field}`;
     } catch (error) {
       console.log('create favService', error);
     }
   }
 
-  async delete(field: string, id: string) {
+  async delete(group: string, id: string) {
     try {
-      await this.favDB.delete(field, id);
+      // remove form favorites if there
+      let favs: IFav;
+      const [favObj] = await this.favDB.find(); // get only item
+      if (!favObj) favs = { artists: [], albums: [], tracks: [] };
+      else favs = favObj;
 
-      return `${id} deleted from ${field}`;
+      favs[group] = favs[group].filter((item: string) => item !== id);
+      await this.favDB.save(favs);
+
+      return `${id} removed from ${group}`;
     } catch (error) {
       console.log('delete favService', error);
     }

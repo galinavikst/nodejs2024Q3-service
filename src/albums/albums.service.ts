@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { IAlbum } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { AlbumsRepo, FavRepo } from 'src/db';
 import { CreateAlbumDto, UpdateAlbumDto } from './dto/albums.dto';
-import { TrackService } from 'src/tracks/tracks.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Album } from './album.model';
 
 @Injectable()
 export class AlbumsService {
   constructor(
-    private albumsDB: AlbumsRepo,
-    private favDB: FavRepo,
-    private tracksService: TrackService,
+    @InjectRepository(Album)
+    private albumsDB: Repository<Album>,
   ) {}
 
   async findAll(): Promise<IAlbum[]> {
     try {
-      const albums = this.albumsDB.findAll();
+      const albums = this.albumsDB.find();
 
-      return Object.values(albums);
+      return albums;
     } catch (error) {
       console.log('findAll AlbumsService', error);
     }
@@ -26,22 +26,22 @@ export class AlbumsService {
   async create(album: CreateAlbumDto): Promise<IAlbum> {
     try {
       const id = uuidv4();
-      const newAlbum = {
+      const newAlbum = this.albumsDB.create({
         ...album,
         artistId: album.artistId || null,
         id,
-      };
-      this.albumsDB.save(newAlbum);
+      });
 
-      return newAlbum;
+      return await this.albumsDB.save(newAlbum);
     } catch (error) {
       console.log('create AlbumsService', error);
+      throw new Error(error);
     }
   }
 
   async getItemById(id: string) {
     try {
-      return this.albumsDB.getById(id);
+      return await this.albumsDB.findOneBy({ id });
     } catch (error) {
       console.log('getTrackById AlbumsService', error);
     }
@@ -49,13 +49,7 @@ export class AlbumsService {
 
   async update(id: string, body: UpdateAlbumDto) {
     try {
-      const track = this.albumsDB.getById(id);
-      const updatedTrack = {
-        ...track,
-        ...body,
-      };
-
-      return this.albumsDB.update(updatedTrack);
+      return await this.albumsDB.save({ id, ...body });
     } catch (error) {
       console.log('update AlbumsService', error);
     }
@@ -63,20 +57,7 @@ export class AlbumsService {
 
   async delete(id: string) {
     try {
-      // remove form favorites if there
-      const favDB = await this.favDB.findAll();
-      if (favDB.albums.includes(id)) {
-        await this.favDB.delete('albums', id);
-      }
-
-      // set albumId: null in track
-      const tracks = await this.tracksService.findAll();
-      const tracksWithAlbum = tracks.filter((track) => track.albumId === id);
-      for (const track of tracksWithAlbum) {
-        await this.tracksService.update(track.id, { albumId: null });
-      }
-
-      return this.albumsDB.delete(id);
+      return await this.albumsDB.delete(id);
     } catch (error) {
       console.log('delete AlbumsService', error);
     }

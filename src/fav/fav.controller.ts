@@ -11,17 +11,20 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { FavService } from './fav.service';
-import { IFavResponse } from 'src/interfaces';
-import { FavRepo } from 'src/db';
+import { IFav, IFavResponse } from 'src/interfaces';
 import { HelperService } from 'src/helper/helper.service';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Fav } from './fav.model';
+import { Repository } from 'typeorm';
 
 @ApiTags('Favorites')
 @Controller('favs')
 export class FavController {
   constructor(
+    @InjectRepository(Fav)
+    private favDB: Repository<Fav>,
     private favService: FavService,
-    private favDB: FavRepo,
     private helperService: HelperService,
   ) {}
 
@@ -80,7 +83,8 @@ export class FavController {
       throw new UnprocessableEntityException('Invalid favorites group'); // 422
 
     // 404 if corresponding artist is not favorite
-    const favDB: Record<string, string[]> = await this.favDB.findAll();
+    const favDBArr: IFav[] = await this.favDB.find();
+    const favDB = favDBArr[0];
     if (!favDB[favGroups[group].field].includes(id))
       throw new NotFoundException();
 

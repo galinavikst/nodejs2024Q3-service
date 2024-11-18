@@ -2,16 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { IUser } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto, GetUserDto } from './dto/user.dto';
-import { UserRepo } from 'src/db';
 import { plainToClass } from 'class-transformer';
+import { User } from './user.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  constructor(private usersDB: UserRepo) {}
+  constructor(
+    @InjectRepository(User)
+    private usersDB: Repository<User>,
+  ) {}
 
   async findAll(): Promise<IUser[]> {
     try {
-      const users = Object.values(this.usersDB.findAll());
+      const users = await this.usersDB.find();
       return users.map((user) => plainToClass(GetUserDto, user));
     } catch (error) {
       console.log('findAll servise', error);
@@ -21,16 +26,16 @@ export class UserService {
   async create(user: CreateUserDto): Promise<IUser> {
     try {
       const id = uuidv4();
-      const newUser = {
+      const newUser = this.usersDB.create({
         ...user,
         id,
         version: 1,
         createdAt: Date.now(), // timestamp number
         updatedAt: Date.now(),
-      };
-      this.usersDB.save(newUser);
+      }); // same user = new User(newUser)
+      const response = await this.usersDB.save(newUser);
 
-      return plainToClass(GetUserDto, newUser);
+      return plainToClass(GetUserDto, response);
     } catch (error) {
       console.log('create servise', error);
     }
@@ -38,7 +43,9 @@ export class UserService {
 
   async getUserById(id: string) {
     try {
-      return this.usersDB.getById(id);
+      const user = await this.usersDB.findOneBy({ id });
+
+      return user;
     } catch (error) {
       console.log('getUserById servise', error);
     }
@@ -46,15 +53,15 @@ export class UserService {
 
   async update(id: string, newPassword: string) {
     try {
-      const user = this.usersDB.getById(id);
+      const user = await this.usersDB.findOneBy({ id });
       const updatedUser = {
         ...user,
         password: newPassword,
         version: user.version + 1,
-        updatedAt: Date.now(),
+        updatedAt: Date.now() as number,
       };
 
-      return this.usersDB.update(updatedUser);
+      return await this.usersDB.save(updatedUser);
     } catch (error) {
       console.log('update servise', error);
     }

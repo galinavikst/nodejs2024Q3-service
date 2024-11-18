@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { FavService } from './fav.service';
 import { FavController } from './fav.controller';
-import { FavRepo } from 'src/db';
 import { HelperModule } from 'src/helper/helper.module';
+import { Fav } from './fav.model';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [HelperModule],
-  providers: [FavRepo, FavService],
+  imports: [TypeOrmModule.forFeature([Fav]), HelperModule],
+  providers: [FavService],
   controllers: [FavController],
-  exports: [FavService, FavRepo],
+  exports: [TypeOrmModule],
 })
 export class FavModule {}
