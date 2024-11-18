@@ -21,13 +21,26 @@ git checkout dev-db-docker
 ```
 docker compose up
 ```
+After starting the app on port (4000 as default) you can open
+in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
+For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
-## Runinig locally
+
+## Run locally
 ### Installing NPM modules
 ```
 npm install
 ```
-> to run applicatioin locally fix .env file
+### Connect to postgress server and create new db named 'home' or other name but make sure fix .env file then
+```
+psql -U postgres
+```
+- provide the password for the postgres user and press Enter
+```
+CREATE DATABASE "home"; 
+```
+> you may fix .env file with your password.
+> please, make sure your postgres server is running on your machine
 
 ```
 npm run start
