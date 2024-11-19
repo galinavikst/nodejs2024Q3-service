@@ -18,6 +18,7 @@ git checkout dev-db-docker
 ```
 
 ## Run docker
+> Please, make sure your local postgres server is stopped and port 5432 is free.
 ```
 docker compose up
 ```
@@ -27,6 +28,7 @@ For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 
 ## Run locally
+(not required for this task)
 ### Installing NPM modules
 ```
 npm install
