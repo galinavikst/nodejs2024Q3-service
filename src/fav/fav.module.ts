@@ -4,6 +4,7 @@ import { FavController } from './fav.controller';
 import { HelperModule } from 'src/helper/helper.module';
 import { Fav } from './fav.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CombinedAuthGuard } from 'src/auth/auth.guard';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Fav]), HelperModule],

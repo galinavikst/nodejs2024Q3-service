@@ -44,3 +44,9 @@ export class GetUserDto {
   @Exclude()
   password: string;
 }
+
+export class RefreshDto {
+  @IsString()
+  @IsNotEmpty()
+  refreshToken: string;
+}

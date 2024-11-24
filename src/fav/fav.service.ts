@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HelperService } from 'src/helper/helper.service';
 import { IFav, IFavResponse } from 'src/interfaces';
@@ -12,6 +12,8 @@ export class FavService {
     private favDB: Repository<Fav>,
     private helperService: HelperService,
   ) {}
+
+  //private readonly logger = new Logger(FavService.name);
 
   async findAll(): Promise<IFavResponse> {
     try {

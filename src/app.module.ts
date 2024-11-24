@@ -13,6 +13,9 @@ import { Artist } from './artists/artist.model';
 import { Fav } from './fav/fav.model';
 import { Track } from './tracks/track.model';
 import { User } from './users/user.model';
+import { AuthModule } from './auth/auth.module';
+import { LoggerModule } from './logger/logger.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -22,11 +25,12 @@ import { User } from './users/user.model';
     ArtistsModule,
     FavModule,
     HelperModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
+      imports: [AuthModule, ConfigModule, LoggerModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
@@ -39,11 +43,10 @@ import { User } from './users/user.model';
         logging: configService.get('DB_LOGGING'),
         entities: [User, Track, Fav, Artist, Album],
         migrations: ['dist/migrations/*.{js,ts}'],
-        // autoLoadEntities: true,
       }),
     }),
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {

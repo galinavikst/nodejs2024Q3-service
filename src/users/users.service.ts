@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IUser } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto, GetUserDto } from './dto/user.dto';
@@ -6,9 +6,12 @@ import { plainToClass } from 'class-transformer';
 import { User } from './user.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectRepository(User)
     private usersDB: Repository<User>,
@@ -26,9 +29,13 @@ export class UserService {
   async create(user: CreateUserDto): Promise<IUser> {
     try {
       const id = uuidv4();
+      const saltRounds = 10;
+      const passwordHash = await bcrypt.hash(user.password, saltRounds);
+
       const newUser = this.usersDB.create({
         ...user,
         id,
+        password: passwordHash,
         version: 1,
         createdAt: Date.now(), // timestamp number
         updatedAt: Date.now(),
@@ -37,7 +44,7 @@ export class UserService {
 
       return plainToClass(GetUserDto, response);
     } catch (error) {
-      console.log('create servise', error);
+      this.logger.error('create servise', error);
     }
   }
 

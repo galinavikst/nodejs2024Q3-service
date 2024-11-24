@@ -4,11 +4,15 @@ import {
   Get,
   HttpCode,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
+  Request,
+  Res,
   UnprocessableEntityException,
+  UseGuards,
 } from '@nestjs/common';
 import { FavService } from './fav.service';
 import { IFav, IFavResponse } from 'src/interfaces';
@@ -17,10 +21,15 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Fav } from './fav.model';
 import { Repository } from 'typeorm';
+import { CombinedAuthGuard } from 'src/auth/auth.guard';
 
+//@UseGuards(AuthGuard)
+@UseGuards(CombinedAuthGuard)
 @ApiTags('Favorites')
 @Controller('favs')
 export class FavController {
+  //private readonly logger = new Logger(FavController.name);
+
   constructor(
     @InjectRepository(Fav)
     private favDB: Repository<Fav>,
@@ -30,11 +39,18 @@ export class FavController {
 
   @Get()
   @ApiOperation({ summary: 'Get all favorite items' })
-  async findAll(): Promise<IFavResponse> {
-    const favs = await this.favService.findAll();
-    if (!favs) throw new InternalServerErrorException();
+  async findAll(@Request() req): Promise<IFavResponse> {
+    const { url, query, body } = req;
+    //this.logger.log(`Request: ${url}, ${query}, ${body}`);
 
-    return favs;
+    const favs = await this.favService.findAll();
+    if (!favs) {
+      //this.logger.error('500 error');
+      throw new InternalServerErrorException();
+    } else {
+      //this.logger.debug('response:', JSON.stringify(favs), 'status code: 200');
+      return favs;
+    }
   }
 
   @Post(':group/:id')

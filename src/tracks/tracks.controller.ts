@@ -11,12 +11,15 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ITrack } from 'src/interfaces';
 import { TrackService } from './tracks.service';
 import { CreateTrackDto, UpdateTrackDto } from './dto/tracks.dto';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CombinedAuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(CombinedAuthGuard)
 @ApiTags('Tracks')
 @Controller('track')
 export class TracksController {
