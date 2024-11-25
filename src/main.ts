@@ -3,11 +3,18 @@ import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
+import { MyLogger } from './logger/logger.service';
+//import { HeaderInterceptor } from './auth/header.interseptor';
 
 dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
+  app.useLogger(app.get(MyLogger));
+  //app.useGlobalInterceptors(new HeaderInterceptor());
 
   function createSwaggerDocument(app: INestApplication): OpenAPIObject {
     const config = new DocumentBuilder()

@@ -40,3 +40,9 @@ export interface IFavResponse {
   albums: IAlbum[];
   tracks: ITrack[];
 }
+
+export interface ITokens {
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
+}

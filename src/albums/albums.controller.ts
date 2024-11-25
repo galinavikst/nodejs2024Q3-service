@@ -13,12 +13,15 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { IAlbum } from 'src/interfaces';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto, UpdateAlbumDto } from './dto/albums.dto';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CombinedAuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(CombinedAuthGuard)
 @ApiTags('Albums')
 @Controller('album')
 export class AlbumsController {

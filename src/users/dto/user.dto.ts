@@ -5,7 +5,7 @@ import { IsNotEmpty, IsString, Matches } from 'class-validator';
 export class CreateUserDto {
   @ApiProperty()
   @IsNotEmpty() // required -> 400 bad request if empty or undefined
-  @IsString()
+  @IsString({ message: 'login sould be a string and unique' })
   login: string;
 
   @ApiProperty()
@@ -43,4 +43,10 @@ export class GetUserDto {
 
   @Exclude()
   password: string;
+}
+
+export class RefreshDto {
+  @IsString()
+  @IsNotEmpty()
+  refreshToken: string;
 }

@@ -10,12 +10,15 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { IArtist } from 'src/interfaces';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto, UpdateArtistDto } from './dto/artist.dto';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CombinedAuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(CombinedAuthGuard)
 @ApiTags('Artists')
 @Controller('artist')
 export class ArtistsController {
