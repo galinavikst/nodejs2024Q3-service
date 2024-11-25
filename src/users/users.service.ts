@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { IUser } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto, GetUserDto } from './dto/user.dto';
 import { plainToClass } from 'class-transformer';
 import { User } from './user.model';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -51,6 +51,7 @@ export class UserService {
   async getUserById(id: string) {
     try {
       const user = await this.usersDB.findOneBy({ id });
+      if (!user) throw new NotFoundException();
 
       return user;
     } catch (error) {

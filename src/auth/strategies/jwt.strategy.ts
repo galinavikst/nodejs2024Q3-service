@@ -29,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const request = context.switchToHttp().getRequest();
     this.logger.log(request);
 
-    const authHeader = request.headers['Authorization'];
+    const authHeader = request.headers['authorization'];
     const token = this.extractTokenFromHeader(request);
     this.logger.log('Extracted Token:', token);
 
@@ -44,6 +44,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get('JWT_SECRET_KEY'),
       });
+      console.log(payload);
+
       this.logger.log('Verified Payload:', payload);
 
       // 💡 We're assigning the payload to the request object here

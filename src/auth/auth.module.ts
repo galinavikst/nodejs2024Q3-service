@@ -12,13 +12,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   imports: [
     UsersModule,
     PassportModule,
-    // JwtModule.register({
-    //   secret: jwtConstants.secret,
-    //   signOptions: { expiresIn: '60s' },
-    // }),
-
     JwtModule.registerAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule, PassportModule, JwtModule],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET_KEY'),
         signOptions: { expiresIn: 'ACCESS_TOKEN_EXPIRE_TIME' },

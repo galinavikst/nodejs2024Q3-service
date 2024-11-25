@@ -34,19 +34,19 @@ export class UsersController {
   constructor(private userService: UserService) {}
 
   @Get()
-  //@Header('Content-Type', 'application/json; charset=utf-8') // by default
   @ApiOperation({ summary: 'Get all users' })
   async findAll(@Req() req: Request): Promise<Omit<IUser, 'password'>[]> {
-    // try {
-    this.logger.log(req.headers);
-    const users = await this.userService.findAll();
-    if (!users) throw new InternalServerErrorException();
+    try {
+      console.log('Response Header:', req.header('Authorization'));
 
-    return users; // positive default statusCode 200
-    // } catch (error) {
-    // console.log(error);
-    // return error;
-    //}
+      const users = await this.userService.findAll();
+      if (!users) throw new InternalServerErrorException();
+
+      return users; // positive default statusCode 200
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 
   @Get(':id')

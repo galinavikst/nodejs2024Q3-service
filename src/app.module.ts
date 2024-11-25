@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { TracksModule } from './tracks/tracks.module';
@@ -16,6 +16,9 @@ import { User } from './users/user.model';
 import { AuthModule } from './auth/auth.module';
 import { LoggerModule } from './logger/logger.module';
 import { AppController } from './app.controller';
+import { LoggerMiddleware } from './middlewares/logger.middleware';
+import { HeaderMiddleware } from './middlewares/header.middleware';
+import * as cookieParser from 'cookie-parser';
 
 @Module({
   imports: [
@@ -51,4 +54,17 @@ import { AppController } from './app.controller';
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(cookieParser(), LoggerMiddleware, HeaderMiddleware)
+      .exclude(
+        { path: '/auth/login', method: RequestMethod.POST },
+        { path: '/auth/signup', method: RequestMethod.POST },
+        //{ path: '/auth/refresh', method: RequestMethod.POST },
+        { path: '/doc', method: RequestMethod.GET },
+        { path: '/', method: RequestMethod.GET },
+      )
+      .forRoutes('*');
+  }
 }

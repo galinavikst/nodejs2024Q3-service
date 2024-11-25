@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
 import { MyLogger } from './logger/logger.service';
+//import { HeaderInterceptor } from './auth/header.interseptor';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ async function bootstrap() {
   });
 
   app.useLogger(app.get(MyLogger));
+  //app.useGlobalInterceptors(new HeaderInterceptor());
 
   function createSwaggerDocument(app: INestApplication): OpenAPIObject {
     const config = new DocumentBuilder()
