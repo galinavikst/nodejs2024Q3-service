@@ -1,15 +1,10 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Request, Response, NextFunction } from 'express';
-import { AuthController } from 'src/auth/auth.controller';
 import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class HeaderMiddleware implements NestMiddleware {
-  constructor(
-    //private jwtService: JwtService,
-    private authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
@@ -17,21 +12,17 @@ export class HeaderMiddleware implements NestMiddleware {
       const refreshToken = req.cookies['refreshToken'];
 
       if (!accessToken || !refreshToken) {
-        console.error('Tokens are missing');
         res.status(401).send({ error: 'Authentication tokens are missing' });
         return;
       }
 
-      const isValidAccessToken = await this.authService.validateToken(
-        accessToken,
-      );
-
-      if (!isValidAccessToken) {
-        const newTokens = await this.authService.refresh(refreshToken);
-
-        req.headers['authorization'] = `Bearer ${newTokens.accessToken}`;
-      } else {
+      try {
+        await this.authService.validateToken(accessToken);
         req.headers['authorization'] = `Bearer ${accessToken}`;
+      } catch (error) {
+        const newTokens = await this.authService.refresh(refreshToken, res);
+        req.headers['authorization'] = `Bearer ${newTokens.accessToken}`;
+        req.body = newTokens;
       }
 
       console.log('Header set:', req.headers['authorization']);

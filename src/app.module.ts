@@ -61,7 +61,6 @@ export class AppModule {
       .exclude(
         { path: '/auth/login', method: RequestMethod.POST },
         { path: '/auth/signup', method: RequestMethod.POST },
-        //{ path: '/auth/refresh', method: RequestMethod.POST },
         { path: '/doc', method: RequestMethod.GET },
         { path: '/', method: RequestMethod.GET },
       )

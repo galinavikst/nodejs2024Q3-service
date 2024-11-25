@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false, // with expired JWT, the request will be denied and a 401 Unauthorized
+      ignoreExpiration: true, // with expired JWT, the request will be denied and a 401 Unauthorized
       secretOrKey: configService.get('JWT_SECRET_KEY'),
     });
   }
